@@ -1,46 +1,55 @@
-import nodemailer from "nodemailer";
+"use server";
 
-export async function POST(req) {
-    try {
-        const { firstname, lastname, country, subject } = await req.json();
+import { Resend } from "resend";
 
-        // Validate inputs
-        if (!firstname || !lastname || !country || !subject) {
-            return new Response(JSON.stringify({ error: "All fields are required!" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            });
+const resend = new Resend(process.env.Resend_API_Key);
+
+export const sendEmail = async (formData) => {
+    const name = formData.get("fullname"); // This is now the full name input
+    const senderEmail = formData.get("senderEmail"); // This is the email input
+    const country = formData.get("country");
+    const message = formData.get("message");
+
+    console.log("Fullname:", name);
+    console.log("Email Address:", senderEmail);
+    console.log("Country:", country);
+    console.log("Message:", message);
+
+        // // Perform validation
+        if (!name || !validateString(name, 100)) {
+            return {
+                error: "Invalid full name", // Customize the error message as needed
+            };
+        }
+    
+        // Validate sender email (Ensure it's not empty and within the max length)
+        if (!senderEmail || !validateString(senderEmail, 500)) {
+            return {
+                error: "Invalid sender email",
+            };
+        }
+    
+        // Validate country (Ensure it's not empty and one of the valid options)
+        const validCountries = ["australia", "canada", "usa", "uk"];
+        if (!country || !validCountries.includes(country)) {
+            return {
+                error: "Invalid country. Please select a valid country.",
+            };
+        }
+    
+        // Validate message (Ensure it's not empty)
+        if (!message) {
+            return {
+                error: "Must fill out the booking info",
+            };
         }
 
-        // Configure SMTP Transporter
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER, // Your Gmail address
-                pass: process.env.EMAIL_PASS, // Your Gmail App Password
-            },
-        });
+    await resend.emails.send({
+        from: "onbaording@resend.dev",
+        to: "samuelbishop06@yahoo.com",
+        subject: "Message from Booking Form",
+        reply_to: senderEmail,
+        text: message,
+    });
+};
 
-        // Email options
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: "opulentsoundexp@gmail.com", // DJ Bagguy's email
-            subject: `New Booking from ${firstname} ${lastname}`,
-            text: `Name: ${firstname} ${lastname}\nCountry: ${country}\nMessage: ${subject}`,
-        };
-
-        // Send email
-        await transporter.sendMail(mailOptions);
-
-        return new Response(JSON.stringify({ message: "Email sent successfully!" }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
-
-    } catch (error) {
-        return new Response(JSON.stringify({ error: "Failed to send email" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
-    }
-}

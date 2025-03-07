@@ -2,6 +2,8 @@
 import "../app/styles/globals.css";
 import { useState, useEffect, useRef } from "react";
 
+
+
 export default function Home() {
   const videos = [
     "/videos/bagguyclip1.mp4",
