@@ -58,7 +58,7 @@ export const sendEmail = async (formData) => {
     try {
         await resend.emails.send({
             from: "Book BagGuy <onbaording@resend.dev>",
-            to: "samuelbishop06@yahoo.com",
+            to: "opulentsoundexp@gmail.com",
             subject: "Message from Booking Form",
             reply_to: senderEmail,
             text: emailBody, // Include full data in the email body
