@@ -79,3 +79,26 @@ body {
     font-size: 0.75rem;
   }
 }
+
+.header-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 50;
+}
+
+.header-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: opacity 0.3s ease;
+}
+
+.header-link:hover {
+  opacity: 0.8;
+}
